@@ -1,0 +1,72 @@
+name: Release and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+      - name: Run Pest tests
+        run: ./vendor/bin/pest
+
+      - name: Increment Version
+        id: increment_version
+        run: |
+          # Obter a última tag, se houver
+          git fetch --tags # Buscar todas as tags remotas
+          current_version=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.1.1")
+          echo "Current version: $current_version"
+
+          # Extrair as partes da versão
+          IFS='.' read -r -a version_parts <<< "${current_version#v}"
+          major=${version_parts[0]}
+          minor=${version_parts[1]}
+          patch=${version_parts[2]}
+
+          # Incrementar a versão
+          while true; do
+            if [ "$patch" -lt 9 ]; then
+              patch=$((patch + 1))
+            else
+              patch=0
+              if [ "$minor" -lt 9 ]; then
+                minor=$((minor + 1))
+              else
+                minor=0
+                major=$((major + 1))
+              fi
+            fi
+
+            new_version="v$major.$minor.$patch"
+
+            # Verificar se a tag já existe
+            if git rev-parse "refs/tags/$new_version" >/dev/null 2>&1; then
+              echo "Tag $new_version já existe. Incrementando versão novamente."
+            else
+              echo "Nova versão: $new_version"
+              break
+            fi
+          done
+
+          # Salvar a nova versão no ambiente do GitHub
+          echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+
+      - name: Create Release
+        run: |
+          gh release create ${{ env.NEW_VERSION }} --title "${{ env.NEW_VERSION }}" --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

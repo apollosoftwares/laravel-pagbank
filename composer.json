@@ -1,0 +1,47 @@
+{
+    "name": "apollosoftwares/pagbank",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luan Amaro",
+            "email": "luan.amaro13@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Apollosoftwares\\Pagbank\\App\\": "src/PagBank/app/",
+            "Apollosoftwares\\Pagbank\\": "src/PagBank/",
+            "Helpers\\": "src/PagBank/app/Helpers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/support": "*"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Apollosoftwares\\Pagbank\\App\\Providers\\PagBankServiceProvider"
+            ],
+            "aliases": {
+                "PagBank": "Apollosoftwares\\Pagbank\\PagBankFacade"
+            }
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.35"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
