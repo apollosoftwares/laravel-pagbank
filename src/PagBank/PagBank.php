@@ -90,17 +90,17 @@ class PagBank extends PagBankClient
         switch ($paymentMethods->type) {
             case 'BANK_SLIP':
                 $charges = $this->chargeBankSlip(
-                    charges: $paymentMethods->charges
+                    $paymentMethods->charges
                 );
                 break;
             case 'CREDIT_CARD':
                 $charges = $this->chargeCreditCard(
-                    charges: $paymentMethods->charges
+                    $paymentMethods->charges
                 );
                 break;
             case 'PIX':
                 $charges = $this->chargePIX(
-                    qrCode: $paymentMethods->charges
+                    $paymentMethods->charges
                 );
                 break;
             default:
@@ -138,8 +138,8 @@ class PagBank extends PagBankClient
         }
 
         return $this->execute(
-            parameters: $data,
-            url: $this->url['orders']
+            $data,
+            $this->url['orders']
         );
     }
 
